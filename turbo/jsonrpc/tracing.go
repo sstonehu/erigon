@@ -364,10 +364,10 @@ func (api *PrivateDebugAPIImpl) TraceTransaction(ctx context.Context, hash commo
 // TraceCall implements debug_traceCall. Returns Geth style call traces.
 func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *tracersConfig.TraceConfig, stream *jsoniter.Stream) error {
 
-	fmt.Println("-------TraceCall-------")
-	fmt.Println("args: ", args)
-	fmt.Println("config:", config)
-	fmt.Println("config.BlockOverrides:", config.BlockOverrides)
+	// fmt.Println("-------TraceCall-------")
+	// fmt.Println("args: ", args)
+	// fmt.Println("config:", config)
+	// fmt.Println("config.BlockOverrides:", config.BlockOverrides)
 
 	dbtx, err := api.db.BeginRo(ctx)
 	if err != nil {
@@ -433,9 +433,9 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 	txCtx := core.NewEVMTxContext(msg)
 	// Trace the transaction and return
 
-	fmt.Println("blockCtx", blockCtx)
+	// fmt.Println("blockCtx", blockCtx)
 	blockHeaderOverride(&blockCtx, config.BlockOverrides, nil)
-	fmt.Println("blockCtx", blockCtx)
+	// fmt.Println("blockCtx", blockCtx)
 
 	_, err = transactions.TraceTx(ctx, msg, blockCtx, txCtx, ibs, config, chainConfig, stream, api.evmCallTimeout)
 	return err
@@ -451,7 +451,7 @@ func (api *PrivateDebugAPIImpl) TraceCallMany(ctx context.Context, bundles []Bun
 		overrideBlockHash map[uint64]common.Hash
 	)
 
-	fmt.Println("-------TraceCallMany-------")
+	// fmt.Println("-------TraceCallMany-------")
 
 	if config == nil {
 		config = &tracersConfig.TraceConfig{}
@@ -588,7 +588,7 @@ func (api *PrivateDebugAPIImpl) TraceCallMany(ctx context.Context, bundles []Bun
 		stream.WriteArrayStart()
 		// first change blockContext
 
-		fmt.Println("bundle.BlockOverride:", bundle.BlockOverride)
+		// fmt.Println("bundle.BlockOverride:", bundle.BlockOverride)
 		blockHeaderOverride(&blockCtx, bundle.BlockOverride, overrideBlockHash)
 		ibs.Reset()
 		for txnIndex, txn := range bundle.Transactions {
