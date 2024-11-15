@@ -40,6 +40,16 @@ import (
 	"github.com/erigontech/erigon/eth/tracers/logger"
 )
 
+type BlockOverrides struct {
+	BlockNumber *hexutil.Uint64
+	Coinbase    *libcommon.Address
+	Timestamp   *hexutil.Uint64
+	GasLimit    *hexutil.Uint
+	Difficulty  *hexutil.Uint
+	BaseFee     *uint256.Int
+	BlockHash   *map[uint64]libcommon.Hash
+}
+
 // CallArgs represents the arguments for a call.
 type CallArgs struct {
 	From                 *libcommon.Address `json:"from"`
