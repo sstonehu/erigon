@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"runtime"
+	"time"
 	"unsafe"
 
 	"github.com/c2h5oh/datasize"
@@ -155,6 +156,9 @@ func (db *DB) CHandle() unsafe.Pointer {
 }
 
 func (db *DB) BeginRo(ctx context.Context) (txn kv.Tx, err error) {
+
+	var start_db = time.Now().UnixNano()
+
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
@@ -172,6 +176,8 @@ func (db *DB) BeginRo(ctx context.Context) (txn kv.Tx, err error) {
 		}
 	}()
 
+	var acquire_db = time.Now().UnixNano()
+
 	streamCtx, streamCancelFn := context.WithCancel(ctx) // We create child context for the stream so we can cancel it to prevent leak
 	stream, err := db.remoteKV.Tx(streamCtx)
 	if err != nil {
@@ -183,6 +189,10 @@ func (db *DB) BeginRo(ctx context.Context) (txn kv.Tx, err error) {
 		streamCancelFn()
 		return nil, err
 	}
+
+	var end_db = time.Now().UnixNano()
+
+	fmt.Println("db acquire time: ", acquire_db-start_db, " db open time: ", end_db-acquire_db)
 	return &tx{ctx: ctx, db: db, stream: stream, streamCancelFn: streamCancelFn, viewID: msg.ViewId, id: msg.TxId}, nil
 }
 func (db *DB) BeginTemporalRo(ctx context.Context) (kv.TemporalTx, error) {
