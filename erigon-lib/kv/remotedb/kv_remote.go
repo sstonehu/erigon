@@ -263,7 +263,7 @@ func (tx *tx) Commit() error {
 func (tx *tx) Rollback() {
 	// don't close opened cursors - just close stream, server will cleanup everything well
 	tx.closeGrpcStream()
-	tx.db.roTxsLimiter.Release(1)
+	// tx.db.roTxsLimiter.Release(1)
 	for _, c := range tx.streams {
 		c.Close()
 	}
