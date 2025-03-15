@@ -412,6 +412,9 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 		txNumsReader := rawdbv3.TxNums.WithCustomReadTxNumFunc(freezeblocks.ReadTxNumFuncFromBlockReader(ctx, api._blockReader))
 		stateReader, err = rpchelper.CreateHistoryStateReader(dbtx, txNumsReader, blockNumber, int(*config.TxIndex), chainConfig.ChainName)
 	}
+
+	var state_traceCall = time.Now().UnixMilli()
+
 	if err != nil {
 		return fmt.Errorf("create state reader: %v", err)
 	}
@@ -454,13 +457,15 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 
 	// fmt.Println(id, time.Now().UnixMilli(), "debug_traceCall TraceTx 5")
 
+	var ctx_traceCall = time.Now().UnixMilli()
+
 	_, err = transactions.TraceTx(ctx, msg, blockCtx, txCtx, hash, 0, ibs, config, chainConfig, stream, api.evmCallTimeout)
 
 	// fmt.Println(id, time.Now().UnixMilli(), "debug_traceCall return 6")
 	var end_traceCall int64
 	end_traceCall = time.Now().UnixMilli()
 
-	fmt.Println(id, "debug_traceCall took", end_traceCall-start_traceCall, "ms")
+	fmt.Println(id, "debug_traceCall took", end_traceCall-start_traceCall, "ms, state took", state_traceCall-start_traceCall, "ms, ctx took", ctx_traceCall-state_traceCall, "ms, trace took", end_traceCall-ctx_traceCall, "ms")
 
 	return err
 }
