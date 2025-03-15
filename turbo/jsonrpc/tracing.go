@@ -398,12 +398,14 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 		return fmt.Errorf("get block number: %v", err)
 	}
 
+	var blocknunber_traceCall = time.Now().UnixMilli()
+
 	err = api.BaseAPI.checkPruneHistory(ctx, dbtx, blockNumber)
 	if err != nil {
 		return err
 	}
 
-	var blocknunber_traceCall = time.Now().UnixMilli()
+	var prun_traceCall = time.Now().UnixMilli()
 
 	var stateReader state.StateReader
 	if config == nil || config.TxIndex == nil || isLatest {
@@ -468,8 +470,8 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 
 	fmt.Println(id, "debug_traceCall took", end_traceCall-start_traceCall,
 		"ms, blocknunber took", blocknunber_traceCall-start_traceCall,
-		"ms, state took", state_traceCall-blocknunber_traceCall,
-		"ms, ctx and trace took", end_traceCall-state_traceCall)
+		"ms, prun took", prun_traceCall-blocknunber_traceCall,
+		"ms, ctx and trace took", end_traceCall-prun_traceCall)
 
 	return err
 }
