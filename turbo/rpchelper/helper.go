@@ -155,9 +155,9 @@ func CreateStateReader(ctx context.Context, tx kv.TemporalTx, br services.FullBl
 
 func CreateStateReaderFromBlockNumber(ctx context.Context, tx kv.TemporalTx, txNumsReader rawdbv3.TxNumsReader, blockNumber uint64, latest bool, txnIndex int, stateCache kvcache.Cache, chainName string) (state.StateReader, error) {
 	if latest {
-		fmt.Println("CreateStateReader latest 1.7", blockNumber, time.Now())
+		// fmt.Println("CreateStateReader latest 1.7", blockNumber, time.Now())
 		cacheView, err := stateCache.View(ctx, tx)
-		fmt.Println(cacheView)
+		// fmt.Println(cacheView)
 		if err != nil {
 			return nil, err
 		}

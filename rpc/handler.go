@@ -23,6 +23,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -162,6 +163,7 @@ func (h *handler) isRpcMethodNeedsCheck(method string) bool {
 
 // handleBatch executes all messages in a batch and returns the responses.
 func (h *handler) handleBatch(msgs []*jsonrpcMessage) {
+
 	// Emit error response for empty batches:
 	if len(msgs) == 0 {
 		h.startCallProc(func(cp *callProc) {
@@ -182,6 +184,8 @@ func (h *handler) handleBatch(msgs []*jsonrpcMessage) {
 	}
 	// Process calls on a goroutine because they may block indefinitely:
 	h.startCallProc(func(cp *callProc) {
+		var batch_start = time.Now().UnixMilli()
+
 		// All goroutines will place results right to this array. Because requests order must match reply orders.
 		answersWithNils := make([]interface{}, len(msgs))
 		// Bounded parallelism pattern explanation https://blog.golang.org/pipelines#TOC_9.
@@ -228,7 +232,11 @@ func (h *handler) handleBatch(msgs []*jsonrpcMessage) {
 		for _, n := range cp.notifiers {
 			n.activate()
 		}
+
+		var batch_end = time.Now().UnixMilli()
+		fmt.Println("Batch request took:", batch_end-batch_start)
 	})
+
 }
 
 // handleMsg handles a single message.
@@ -399,7 +407,7 @@ func (h *handler) handleResponse(msg *jsonrpcMessage) {
 // handleCallMsg executes a call message and returns the answer.
 func (h *handler) handleCallMsg(ctx *callProc, msg *jsonrpcMessage, stream *jsoniter.Stream) *jsonrpcMessage {
 
-	h.logger.Info("[rpc] served", "method", msg.Method)
+	// h.logger.Info("[rpc] served", "method", msg.Method)
 
 	switch {
 	case msg.isNotification():

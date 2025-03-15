@@ -139,7 +139,9 @@ func (s *Server) serveSingleRequest(ctx context.Context, codec ServerCodec, stre
 		if s.batchLimit > 0 && len(reqs) > s.batchLimit {
 			codec.WriteJSON(ctx, errorMessage(fmt.Errorf("batch limit %d exceeded (can increase by --rpc.batch.limit). Requested batch of size: %d", s.batchLimit, len(reqs))))
 		} else {
+
 			h.handleBatch(reqs)
+
 		}
 	} else {
 		h.handleMsg(reqs[0], stream)
