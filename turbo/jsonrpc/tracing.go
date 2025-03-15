@@ -408,7 +408,7 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 		return err
 	}
 
-	var prun_traceCall = time.Now().UnixMilli()
+	// var prun_traceCall = time.Now().UnixMilli()
 
 	var stateReader state.StateReader
 	if config == nil || config.TxIndex == nil || isLatest {
