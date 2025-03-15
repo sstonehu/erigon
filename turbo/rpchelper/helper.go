@@ -82,8 +82,8 @@ func _GetBlockNumber(ctx context.Context, requireCanonical bool, blockNrOrHash r
 	var stage_getBlockNumber = time.Now().UnixMilli()
 
 	if !ok {
-		// number := *blockNrOrHash.BlockNumber
-		number := rpc.LatestBlockNumber
+		number := *blockNrOrHash.BlockNumber
+		// number := rpc.LatestBlockNumber
 		switch number {
 		case rpc.LatestBlockNumber:
 			if blockNumber, err = GetLatestBlockNumber(tx); err != nil {
