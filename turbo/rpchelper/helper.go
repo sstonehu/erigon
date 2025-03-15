@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	state2 "github.com/erigontech/erigon-lib/state"
 
@@ -154,12 +155,16 @@ func CreateStateReader(ctx context.Context, tx kv.TemporalTx, br services.FullBl
 
 func CreateStateReaderFromBlockNumber(ctx context.Context, tx kv.TemporalTx, txNumsReader rawdbv3.TxNumsReader, blockNumber uint64, latest bool, txnIndex int, stateCache kvcache.Cache, chainName string) (state.StateReader, error) {
 	if latest {
+		fmt.Println("CreateStateReader latest 1.7", blockNumber, time.Now())
 		cacheView, err := stateCache.View(ctx, tx)
+		fmt.Println(cacheView)
 		if err != nil {
 			return nil, err
 		}
 		return CreateLatestCachedStateReader(cacheView, tx), nil
 	}
+
+	fmt.Println("CreateStateReader not latest 1.8", blockNumber, time.Now())
 	return CreateHistoryStateReader(tx, txNumsReader, blockNumber+1, txnIndex, chainName)
 }
 

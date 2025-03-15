@@ -55,6 +55,7 @@ func ProcessHealthcheckIfNeeded(
 	r *http.Request,
 	rpcAPI []rpc.API,
 ) bool {
+
 	if !strings.EqualFold(r.URL.Path, urlPath) {
 		return false
 	}

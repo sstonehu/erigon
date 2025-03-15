@@ -72,6 +72,7 @@ func (r *serviceRegistry) registerName(name string, rcvr interface{}) error {
 	if name == "" {
 		return fmt.Errorf("no service name for type %s", rcvrVal.Type().String())
 	}
+	fmt.Println("registerName", rcvrVal.Type().String())
 	callbacks := suitableCallbacks(rcvrVal, r.logger)
 	if len(callbacks) == 0 {
 		return fmt.Errorf("service %T doesn't have any suitable methods/subscriptions to expose", rcvr)
@@ -123,10 +124,16 @@ func (r *serviceRegistry) subscription(service, name string) *callback {
 // satisfies the criteria for a RPC callback or a subscription callback and adds it to the
 // collection of callbacks. See server documentation for a summary of these criteria.
 func suitableCallbacks(receiver reflect.Value, logger log.Logger) map[string]*callback {
+
+	fmt.Println("suitableCallbacks")
+
 	typ := receiver.Type()
 	callbacks := make(map[string]*callback)
 	for m := 0; m < typ.NumMethod(); m++ {
+		fmt.Println("type:")
+		fmt.Println(typ)
 		method := typ.Method(m)
+		fmt.Println("method:", method)
 		if method.PkgPath != "" {
 			continue // method not exported
 		}

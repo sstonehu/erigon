@@ -671,6 +671,10 @@ func StartRpcServerWithJwtAuthentication(ctx context.Context, cfg *httpcfg.HttpC
 }
 
 func startRegularRpcServer(ctx context.Context, cfg *httpcfg.HttpCfg, rpcAPI []rpc.API, logger log.Logger) error {
+
+	logger.Info("Starting RPC server")
+	fmt.Println(rpcAPI)
+
 	// register apis and create handler stack
 	srv := rpc.NewServer(cfg.RpcBatchConcurrency, cfg.TraceRequests, cfg.DebugSingleRequest, cfg.RpcStreamingDisable, logger, cfg.RPCSlowLogThreshold)
 
@@ -698,6 +702,9 @@ func startRegularRpcServer(ctx context.Context, cfg *httpcfg.HttpCfg, rpcAPI []r
 			apiFlags = append(apiFlags, flag)
 		}
 	}
+
+	fmt.Println(defaultAPIList)
+	fmt.Println(apiFlags)
 
 	if err := node.RegisterApisFromWhitelist(defaultAPIList, apiFlags, srv, false, logger); err != nil {
 		return fmt.Errorf("could not start register RPC apis: %w", err)
@@ -763,6 +770,9 @@ func startRegularRpcServer(ctx context.Context, cfg *httpcfg.HttpCfg, rpcAPI []r
 	}
 
 	if cfg.HttpServerEnabled {
+
+		logger.Info("Starting HTTP endpoint", "url", cfg.HttpListenAddress, "port", cfg.HttpPort)
+
 		httpEndpoint := fmt.Sprintf("tcp://%s:%d", cfg.HttpListenAddress, cfg.HttpPort)
 		if cfg.HttpURL != "" {
 			httpEndpoint = cfg.HttpURL

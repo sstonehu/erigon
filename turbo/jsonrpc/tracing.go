@@ -371,6 +371,9 @@ func (api *PrivateDebugAPIImpl) TraceTransaction(ctx context.Context, hash commo
 
 // TraceCall implements debug_traceCall. Returns Geth style call traces.
 func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *tracersConfig.TraceConfig, stream *jsoniter.Stream) error {
+
+	fmt.Println("debug_traceCall locally")
+
 	dbtx, err := api.db.BeginTemporalRo(ctx)
 	if err != nil {
 		return fmt.Errorf("create ro transaction: %v", err)
@@ -395,8 +398,10 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 
 	var stateReader state.StateReader
 	if config == nil || config.TxIndex == nil || isLatest {
+		fmt.Println("debug_traceCall CreateStateReader 1.1", time.Now())
 		stateReader, err = rpchelper.CreateStateReader(ctx, dbtx, api._blockReader, blockNrOrHash, 0, api.filters, api.stateCache, chainConfig.ChainName)
 	} else {
+		fmt.Println("debug_traceCall CreateStateReader 1.2", time.Now())
 		txNumsReader := rawdbv3.TxNums.WithCustomReadTxNumFunc(freezeblocks.ReadTxNumFuncFromBlockReader(ctx, api._blockReader))
 		stateReader, err = rpchelper.CreateHistoryStateReader(dbtx, txNumsReader, blockNumber, int(*config.TxIndex), chainConfig.ChainName)
 	}
@@ -410,6 +415,7 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 	if header == nil {
 		return fmt.Errorf("block %d(%x) not found", blockNumber, hash)
 	}
+	fmt.Println("debug_traceCall stateReader 1.3", time.Now())
 	ibs := state.New(stateReader)
 
 	if config != nil && config.StateOverrides != nil {
@@ -431,11 +437,20 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 		return fmt.Errorf("convert args to msg: %v", err)
 	}
 
+	fmt.Println("debug_traceCall NewEVMBlockContext 3", time.Now())
 	blockCtx := transactions.NewEVMBlockContext(engine, header, blockNrOrHash.RequireCanonical, dbtx, api._blockReader, chainConfig)
+
+	fmt.Println("debug_traceCall NewEVMTxContext 4", time.Now())
 	txCtx := core.NewEVMTxContext(msg)
 	blockHeaderOverride(&blockCtx, config.BlockOverrides, nil)
 	// Trace the transaction and return
+
+	fmt.Println("debug_traceCall TraceTx 5", time.Now())
+
 	_, err = transactions.TraceTx(ctx, msg, blockCtx, txCtx, hash, 0, ibs, config, chainConfig, stream, api.evmCallTimeout)
+
+	fmt.Println("debug_traceCall return 6", time.Now())
+
 	return err
 }
 
