@@ -165,9 +165,13 @@ func (db *DB) BeginRo(ctx context.Context) (txn kv.Tx, err error) {
 	default:
 	}
 
+	var cxt_db = time.Now().UnixMilli()
+
 	if semErr := db.roTxsLimiter.Acquire(ctx, 1); semErr != nil {
 		return nil, fmt.Errorf("remotedb.DB.BeginRo: roTxsLimiter error %w", semErr)
 	}
+
+	var acquire_db = time.Now().UnixMilli()
 
 	defer func() {
 		// ensure we release the semaphore on error
@@ -176,7 +180,7 @@ func (db *DB) BeginRo(ctx context.Context) (txn kv.Tx, err error) {
 		}
 	}()
 
-	var acquire_db = time.Now().UnixMilli()
+	var release_db = time.Now().UnixMilli()
 
 	streamCtx, streamCancelFn := context.WithCancel(ctx) // We create child context for the stream so we can cancel it to prevent leak
 	stream, err := db.remoteKV.Tx(streamCtx)
@@ -192,7 +196,8 @@ func (db *DB) BeginRo(ctx context.Context) (txn kv.Tx, err error) {
 
 	var end_db = time.Now().UnixMilli()
 
-	fmt.Println("db acquire time: ", acquire_db-start_db, " db open time: ", end_db-acquire_db)
+	fmt.Println("db ctx", cxt_db-start_db, "acquire", acquire_db-cxt_db, "release", release_db-acquire_db, "end", end_db-release_db)
+
 	return &tx{ctx: ctx, db: db, stream: stream, streamCancelFn: streamCancelFn, viewID: msg.ViewId, id: msg.TxId}, nil
 }
 func (db *DB) BeginTemporalRo(ctx context.Context) (kv.TemporalTx, error) {
