@@ -378,8 +378,7 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 	// 生成 1 到 100000 范围内的随机数
 	id := rand.Intn(100000) + 1
 
-	var start_traceCall int64
-	start_traceCall = time.Now().UnixMilli()
+	var start_traceCall = time.Now().UnixMilli()
 
 	dbtx, err := api.db.BeginTemporalRo(ctx)
 	if err != nil {

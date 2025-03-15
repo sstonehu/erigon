@@ -69,14 +69,21 @@ func GetCanonicalBlockNumber(ctx context.Context, blockNrOrHash rpc.BlockNumberO
 func _GetBlockNumber(ctx context.Context, requireCanonical bool, blockNrOrHash rpc.BlockNumberOrHash, tx kv.Tx, br services.FullBlockReader, filters *Filters) (blockNumber uint64, hash libcommon.Hash, latest bool, found bool, err error) {
 	// Due to changed semantics of `lastest` block in RPC request, it is now distinct
 	// from the block number corresponding to the plain state
+
+	var start_getBlokNumber = time.Now().UnixMilli()
+
 	var plainStateBlockNumber uint64
 	if plainStateBlockNumber, err = stages.GetStageProgress(tx, stages.Execution); err != nil {
 		return 0, libcommon.Hash{}, false, false, fmt.Errorf("getting plain state block number: %w", err)
 	}
 	var ok bool
 	hash, ok = blockNrOrHash.Hash()
+
+	var stage_getBlockNumber = time.Now().UnixMilli()
+
 	if !ok {
-		number := *blockNrOrHash.BlockNumber
+		// number := *blockNrOrHash.BlockNumber
+		number := rpc.LatestBlockNumber
 		switch number {
 		case rpc.LatestBlockNumber:
 			if blockNumber, err = GetLatestBlockNumber(tx); err != nil {
@@ -142,6 +149,10 @@ func _GetBlockNumber(ctx context.Context, requireCanonical bool, blockNrOrHash r
 			return 0, libcommon.Hash{}, false, false, nonCanonocalHashError{hash}
 		}
 	}
+
+	var end_getBlockNumber = time.Now().UnixMilli()
+	fmt.Println("GetBlockNumber, stage:", stage_getBlockNumber-start_getBlokNumber, "end:", end_getBlockNumber-stage_getBlockNumber)
+
 	return blockNumber, hash, blockNumber == plainStateBlockNumber, true, nil
 }
 
