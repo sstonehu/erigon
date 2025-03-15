@@ -176,7 +176,7 @@ func (db *DB) BeginRo(ctx context.Context) (txn kv.Tx, err error) {
 	defer func() {
 		// ensure we release the semaphore on error
 		if txn == nil {
-			db.roTxsLimiter.Release(1)
+			// db.roTxsLimiter.Release(1)
 		}
 	}()
 
