@@ -417,7 +417,7 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 		stateReader, err = rpchelper.CreateHistoryStateReader(dbtx, txNumsReader, blockNumber, int(*config.TxIndex), chainConfig.ChainName)
 	}
 
-	var state_traceCall = time.Now().UnixMilli()
+	// var state_traceCall = time.Now().UnixMilli()
 
 	if err != nil {
 		return fmt.Errorf("create state reader: %v", err)
