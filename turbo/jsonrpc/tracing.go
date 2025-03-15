@@ -403,6 +403,8 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 		return err
 	}
 
+	var blocknunber_traceCall = time.Now().UnixMilli()
+
 	var stateReader state.StateReader
 	if config == nil || config.TxIndex == nil || isLatest {
 		// fmt.Println(id, time.Now().UnixMilli(), "debug_traceCall CreateStateReader 1.1")
@@ -457,15 +459,17 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 
 	// fmt.Println(id, time.Now().UnixMilli(), "debug_traceCall TraceTx 5")
 
-	var ctx_traceCall = time.Now().UnixMilli()
+	// var ctx_traceCall = time.Now().UnixMilli()
 
 	_, err = transactions.TraceTx(ctx, msg, blockCtx, txCtx, hash, 0, ibs, config, chainConfig, stream, api.evmCallTimeout)
 
 	// fmt.Println(id, time.Now().UnixMilli(), "debug_traceCall return 6")
-	var end_traceCall int64
-	end_traceCall = time.Now().UnixMilli()
+	var end_traceCall = time.Now().UnixMilli()
 
-	fmt.Println(id, "debug_traceCall took", end_traceCall-start_traceCall, "ms, state took", state_traceCall-start_traceCall, "ms, ctx took", ctx_traceCall-state_traceCall, "ms, trace took", end_traceCall-ctx_traceCall, "ms")
+	fmt.Println(id, "debug_traceCall took", end_traceCall-start_traceCall,
+		"ms, blocknunber took", blocknunber_traceCall-start_traceCall,
+		"ms, state took", state_traceCall-blocknunber_traceCall,
+		"ms, ctx and trace took", end_traceCall-state_traceCall)
 
 	return err
 }
