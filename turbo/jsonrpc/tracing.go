@@ -386,11 +386,15 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 	}
 	defer dbtx.Rollback()
 
+	var db_traceCall = time.Now().UnixMilli()
+
 	chainConfig, err := api.chainConfig(ctx, dbtx)
 	if err != nil {
 		return fmt.Errorf("read chain config: %v", err)
 	}
 	engine := api.engine()
+
+	var engine_traceCall = time.Now().UnixMilli()
 
 	blockNumber, hash, isLatest, err := rpchelper.GetBlockNumber(ctx, blockNrOrHash, dbtx, api._blockReader, api.filters)
 	if err != nil {
@@ -468,9 +472,10 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 	var end_traceCall = time.Now().UnixMilli()
 
 	fmt.Println(id, "debug_traceCall took", end_traceCall-start_traceCall,
-		"ms, blocknunber took", blocknunber_traceCall-start_traceCall,
-		"ms, prun took", prun_traceCall-blocknunber_traceCall,
-		"ms, ctx and trace took", end_traceCall-prun_traceCall)
+		"ms, db_traceCall", db_traceCall-start_traceCall,
+		"engine_traceCall", engine_traceCall-db_traceCall,
+		"blocknunber_traceCall", blocknunber_traceCall-engine_traceCall,
+		"trace", end_traceCall-blocknunber_traceCall)
 
 	return err
 }
