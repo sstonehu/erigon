@@ -157,7 +157,7 @@ func (db *DB) CHandle() unsafe.Pointer {
 
 func (db *DB) BeginRo(ctx context.Context) (txn kv.Tx, err error) {
 
-	var start_db = time.Now().UnixNano()
+	var start_db = time.Now().UnixMilli()
 
 	select {
 	case <-ctx.Done():
@@ -176,7 +176,7 @@ func (db *DB) BeginRo(ctx context.Context) (txn kv.Tx, err error) {
 		}
 	}()
 
-	var acquire_db = time.Now().UnixNano()
+	var acquire_db = time.Now().UnixMilli()
 
 	streamCtx, streamCancelFn := context.WithCancel(ctx) // We create child context for the stream so we can cancel it to prevent leak
 	stream, err := db.remoteKV.Tx(streamCtx)
@@ -190,7 +190,7 @@ func (db *DB) BeginRo(ctx context.Context) (txn kv.Tx, err error) {
 		return nil, err
 	}
 
-	var end_db = time.Now().UnixNano()
+	var end_db = time.Now().UnixMilli()
 
 	fmt.Println("db acquire time: ", acquire_db-start_db, " db open time: ", end_db-acquire_db)
 	return &tx{ctx: ctx, db: db, stream: stream, streamCancelFn: streamCancelFn, viewID: msg.ViewId, id: msg.TxId}, nil
