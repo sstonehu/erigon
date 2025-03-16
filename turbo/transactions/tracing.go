@@ -110,6 +110,9 @@ func TraceTx(
 	stream *jsoniter.Stream,
 	callTimeout time.Duration,
 ) (usedGas uint64, err error) {
+
+	var start_trace = time.Now().UnixMilli()
+
 	tracer, streaming, cancel, err := AssembleTracer(ctx, config, txCtx.TxHash, blockHash, txnIndex, stream, callTimeout)
 	if err != nil {
 		stream.WriteNil()
@@ -117,6 +120,8 @@ func TraceTx(
 	}
 
 	defer cancel()
+
+	var assemble_trace = time.Now().UnixMilli()
 
 	execCb := func(evm *vm.EVM, refunds bool) (*evmtypes.ExecutionResult, error) {
 		gp := new(core.GasPool).AddGas(message.Gas()).AddBlobGas(message.BlobGas())
@@ -128,7 +133,16 @@ func TraceTx(
 		return res, nil
 	}
 
+	var cb_trace = time.Now().UnixMilli()
+
 	err = ExecuteTraceTx(blockCtx, txCtx, ibs, config, chainConfig, stream, tracer, streaming, execCb)
+
+	var end_trace = time.Now().UnixMilli()
+
+	fmt.Println("assemble_trace", assemble_trace-start_trace,
+		"cb_trace", cb_trace-assemble_trace,
+		"end_trace", end_trace-cb_trace)
+
 	return usedGas, err
 }
 
