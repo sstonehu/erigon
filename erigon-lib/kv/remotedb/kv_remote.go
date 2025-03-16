@@ -99,9 +99,7 @@ func (opts remoteOpts) Open() (*DB, error) {
 		targetSemCount = 2
 	}
 
-	targetSemCount = 5000
 	fmt.Println("targetSemCount", targetSemCount)
-	fmt.Println("opts", opts)
 
 	db := &DB{
 		opts:         opts,
