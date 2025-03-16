@@ -38,7 +38,7 @@ import (
 func main() {
 
 	fmt.Println("runtime.GOMAXPROCS", runtime.GOMAXPROCS(0))
-	runtime.GOMAXPROCS(1000)
+	runtime.GOMAXPROCS(2000)
 
 	cmd, cfg := cli.RootCommand()
 	rootCtx, rootCancel := common.RootContext()
