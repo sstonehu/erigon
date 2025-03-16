@@ -99,7 +99,7 @@ func (opts remoteOpts) Open() (*DB, error) {
 		targetSemCount = 2
 	}
 
-	targetSemCount = 10000
+	targetSemCount = 2000
 	fmt.Println("targetSemCount", targetSemCount)
 	fmt.Println("opts", opts)
 
