@@ -18,8 +18,6 @@ package temporal
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"github.com/erigontech/erigon-lib/kv"
 	"github.com/erigontech/erigon-lib/kv/mdbx"
@@ -73,7 +71,6 @@ func (db *DB) Agg() any            { return db.agg }
 func (db *DB) InternalDB() kv.RwDB { return db.RwDB }
 
 func (db *DB) BeginTemporalRo(ctx context.Context) (kv.TemporalTx, error) {
-	var start_db = time.Now().UnixNano()
 
 	kvTx, err := db.RwDB.BeginRo(ctx) //nolint:gocritic
 	if err != nil {
@@ -81,11 +78,7 @@ func (db *DB) BeginTemporalRo(ctx context.Context) (kv.TemporalTx, error) {
 	}
 	tx := &Tx{MdbxTx: kvTx.(*mdbx.MdbxTx), db: db, ctx: ctx}
 
-	var begined_db = time.Now().UnixNano()
 	tx.filesTx = db.agg.BeginFilesRo()
-
-	var end = time.Now().UnixNano()
-	fmt.Println("BeginDB:", begined_db-start_db, "BeginFiles:", end-begined_db)
 
 	return tx, nil
 }

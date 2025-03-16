@@ -167,16 +167,16 @@ func (db *DB) BeginRo(ctx context.Context) (txn kv.Tx, err error) {
 
 	var cxt_db = time.Now().UnixMilli()
 
-	// if semErr := db.roTxsLimiter.Acquire(ctx, 1); semErr != nil {
-	// 	return nil, fmt.Errorf("remotedb.DB.BeginRo: roTxsLimiter error %w", semErr)
-	// }
+	if semErr := db.roTxsLimiter.Acquire(ctx, 1); semErr != nil {
+		return nil, fmt.Errorf("remotedb.DB.BeginRo: roTxsLimiter error %w", semErr)
+	}
 
 	var acquire_db = time.Now().UnixMilli()
 
 	defer func() {
 		// ensure we release the semaphore on error
 		if txn == nil {
-			// db.roTxsLimiter.Release(1)
+			db.roTxsLimiter.Release(1)
 		}
 	}()
 
@@ -263,7 +263,7 @@ func (tx *tx) Commit() error {
 func (tx *tx) Rollback() {
 	// don't close opened cursors - just close stream, server will cleanup everything well
 	tx.closeGrpcStream()
-	// tx.db.roTxsLimiter.Release(1)
+	tx.db.roTxsLimiter.Release(1)
 	for _, c := range tx.streams {
 		c.Close()
 	}

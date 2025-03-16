@@ -130,10 +130,7 @@ func suitableCallbacks(receiver reflect.Value, logger log.Logger) map[string]*ca
 	typ := receiver.Type()
 	callbacks := make(map[string]*callback)
 	for m := 0; m < typ.NumMethod(); m++ {
-		fmt.Println("type:")
-		fmt.Println(typ)
 		method := typ.Method(m)
-		fmt.Println("method:", method)
 		if method.PkgPath != "" {
 			continue // method not exported
 		}
