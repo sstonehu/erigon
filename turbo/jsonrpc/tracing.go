@@ -408,7 +408,7 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 		return err
 	}
 
-	// var prun_traceCall = time.Now().UnixMilli()
+	var prun_traceCall = time.Now().UnixMilli()
 
 	var stateReader state.StateReader
 	if config == nil || config.TxIndex == nil || isLatest {
@@ -420,7 +420,7 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 		stateReader, err = rpchelper.CreateHistoryStateReader(dbtx, txNumsReader, blockNumber, int(*config.TxIndex), chainConfig.ChainName)
 	}
 
-	// var state_traceCall = time.Now().UnixMilli()
+	var state_traceCall = time.Now().UnixMilli()
 
 	if err != nil {
 		return fmt.Errorf("create state reader: %v", err)
@@ -464,7 +464,7 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 
 	// fmt.Println(id, time.Now().UnixMilli(), "debug_traceCall TraceTx 5")
 
-	// var ctx_traceCall = time.Now().UnixMilli()
+	var ctx_traceCall = time.Now().UnixMilli()
 
 	_, err = transactions.TraceTx(ctx, msg, blockCtx, txCtx, hash, 0, ibs, config, chainConfig, stream, api.evmCallTimeout)
 
@@ -475,7 +475,10 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 		"ms, db_traceCall", db_traceCall-start_traceCall,
 		"engine_traceCall", engine_traceCall-db_traceCall,
 		"blocknunber_traceCall", blocknunber_traceCall-engine_traceCall,
-		"trace", end_traceCall-blocknunber_traceCall)
+		"prun_traceCall", prun_traceCall-blocknunber_traceCall,
+		"state_traceCall", state_traceCall-prun_traceCall,
+		"ctx_traceCall", ctx_traceCall-state_traceCall,
+		"end_traceCall", end_traceCall-ctx_traceCall)
 
 	return err
 }
