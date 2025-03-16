@@ -171,6 +171,7 @@ func (db *DB) BeginRo(ctx context.Context) (txn kv.Tx, err error) {
 
 	var cxt_db = time.Now().UnixMilli()
 
+	fmt.Println("db roTxsLimiter", db.roTxsLimiter)
 	if semErr := db.roTxsLimiter.Acquire(ctx, 1); semErr != nil {
 		return nil, fmt.Errorf("remotedb.DB.BeginRo: roTxsLimiter error %w", semErr)
 	}
