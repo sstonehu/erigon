@@ -24,8 +24,6 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/holiman/uint256"
-
 	"github.com/erigontech/erigon-lib/common"
 	"github.com/erigontech/erigon-lib/common/hexutil"
 	"github.com/erigontech/erigon-lib/common/math"
@@ -41,19 +39,20 @@ import (
 	"github.com/erigontech/erigon/turbo/rpchelper"
 )
 
-type BlockOverrides struct {
-	BlockNumber *hexutil.Uint64
-	Coinbase    *common.Address
-	Timestamp   *hexutil.Uint64
-	GasLimit    *hexutil.Uint
-	Difficulty  *hexutil.Uint
-	BaseFee     *uint256.Int
-	BlockHash   *map[uint64]common.Hash
-}
+// type BlockOverrides struct {
+// 	BlockNumber *hexutil.Uint64
+// 	Coinbase    *common.Address
+// 	Timestamp   *hexutil.Uint64
+// 	GasLimit    *hexutil.Uint
+// 	Difficulty  *hexutil.Uint
+// 	BaseFee     *uint256.Int
+// 	BlockHash   *map[uint64]common.Hash
+// }
 
 type Bundle struct {
-	Transactions  []ethapi.CallArgs
-	BlockOverride BlockOverrides
+	Transactions []ethapi.CallArgs
+	// BlockOverride BlockOverrides
+	BlockOverride ethapi.BlockOverrides
 }
 
 type StateContext struct {
@@ -61,7 +60,7 @@ type StateContext struct {
 	TransactionIndex *int
 }
 
-func blockHeaderOverride(blockCtx *evmtypes.BlockContext, blockOverride BlockOverrides, overrideBlockHash map[uint64]common.Hash) {
+func blockHeaderOverride(blockCtx *evmtypes.BlockContext, blockOverride ethapi.BlockOverrides, overrideBlockHash map[uint64]common.Hash) {
 	if blockOverride.BlockNumber != nil {
 		blockCtx.BlockNumber = uint64(*blockOverride.BlockNumber)
 	}
