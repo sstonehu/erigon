@@ -426,6 +426,9 @@ func (api *PrivateDebugAPIImpl) TraceCall(ctx context.Context, args ethapi.CallA
 
 	blockCtx := transactions.NewEVMBlockContext(engine, header, blockNrOrHash.RequireCanonical, dbtx, api._blockReader, chainConfig)
 	txCtx := core.NewEVMTxContext(msg)
+
+	blockHeaderOverride(&blockCtx, config.BlockOverrides, nil)
+
 	// Trace the transaction and return
 	_, err = transactions.TraceTx(ctx, engine, msg, blockCtx, txCtx, hash, 0, ibs, config, chainConfig, stream, api.evmCallTimeout)
 	return err
