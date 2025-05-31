@@ -182,6 +182,8 @@ func (h *handler) handleBatch(msgs []*jsonrpcMessage) {
 	}
 	// Process calls on a goroutine because they may block indefinitely:
 	h.startCallProc(func(cp *callProc) {
+		// var batch_start = time.Now().UnixMilli()
+
 		// All goroutines will place results right to this array. Because requests order must match reply orders.
 		answersWithNils := make([]interface{}, len(msgs))
 		// Bounded parallelism pattern explanation https://blog.golang.org/pipelines#TOC_9.
@@ -228,6 +230,10 @@ func (h *handler) handleBatch(msgs []*jsonrpcMessage) {
 		for _, n := range cp.notifiers {
 			n.activate()
 		}
+
+		// var batch_end = time.Now().UnixMilli()
+		// fmt.Println("Batch request took:", batch_end-batch_start)
+
 	})
 }
 
