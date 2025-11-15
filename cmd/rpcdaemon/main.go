@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"runtime"
 
 	"github.com/spf13/cobra"
 
@@ -36,7 +35,7 @@ import (
 )
 
 func main() {
-	runtime.GOMAXPROCS(5000)
+	// runtime.GOMAXPROCS(5000)
 
 	cmd, cfg := cli.RootCommand()
 	rootCtx, rootCancel := common.RootContext()
